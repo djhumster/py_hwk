@@ -79,7 +79,12 @@ def make(key, value):
     :return: dict
     """
     result = read() or {}
-    result[key] = value
+
+    if key in result:
+        result[key].append(*value)
+    else:
+        result[key] = list(value)
+
     return result
 
 
