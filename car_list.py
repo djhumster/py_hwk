@@ -16,8 +16,8 @@ class BaseCar:
     def __init__(self, brand, photo_file_name, carrying):
         if not brand:
             raise ValueError('brand обязательный атрибут!')
-        if not path.splitext(photo_file_name)[1]:
-            raise ValueError('photo_file_name обязательный атрибут / без расширения!')
+        if not photo_file_name:
+            raise ValueError('photo_file_name обязательный атрибут!')
         if not carrying:
             raise ValueError('carrying обязательный атрибут!')
         self.brand = brand
@@ -25,7 +25,7 @@ class BaseCar:
         self.carrying = float(carrying)
 
     def get_photo_file_ext(self):
-        return path.splitext(self.photo_file_name)[1]
+        return path.splitext(self.photo_file_name)[1] or None
 
 
 class Car(BaseCar):
@@ -60,7 +60,7 @@ class SpecMachine(BaseCar):
         self.extra = extra
 
 
-def get_car_list(csv_filename):
+def get_car_list(csv_filename='coursera_week3_cars.csv'):
     car_list = []
 
     try:
@@ -69,9 +69,11 @@ def get_car_list(csv_filename):
             next(reader)
 
             for row in reader:
+                tmp = row[0].split(',')
+                row = tmp
                 length = len(row)
 
-                if length == 7:
+                if length >= 6:
                     try:
                         if row[0] == 'car':
                             car_list.append(Car(
@@ -100,7 +102,7 @@ def get_car_list(csv_filename):
 
 
 if __name__ == '__main__':
-    test = get_car_list('coursera_week3_cars.csv')
+    test = get_car_list()
 
     for x in test:
         print(x)
