@@ -54,7 +54,7 @@ class Client:
             (self._srv_ip, self._srv_port), timeout=self._timeout
         ) as sock:
 
-            sock.settimeout(2)
+            sock.settimeout(self._timeout)
         
             try:
                 sock.sendall(msg.encode('utf8'))
