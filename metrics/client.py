@@ -21,38 +21,33 @@ class Client:
     def __init__(self, srv_ip, srv_port, timeout=None):
         self._srv_ip = srv_ip
         self._srv_port = srv_port
-        self._timeout = timeout
-
+        try:
+            self._conn = socket.create_connection((srv_ip, srv_port), timeout)
+        except socket.error as err:
+            raise ClientSocketError('Ошибка подключения:\n', err)
+        
     def put(self, metric, value, timestamp=None):
         if timestamp is None:
             timestamp = str(int(time.time()))
 
         msg = f'put {metric} {value} {timestamp}\n'
-        answer = self._messenger(msg)
-
-        if answer != 'ok\n\n':
-            raise ClientProtocolError(answer)
+        self._messenger(msg)
 
     def get(self, metric):
         result = {}
         msg = f'get {metric}\n'
 
-        answer = self._messenger(msg).split('\n')
+        answer = self._messenger(msg)
 
-        if answer[0] == 'error':
-            raise ClientProtocolError(''.join(answer))
+        if answer == '':
+            return result
 
-        if answer[0] != 'ok':
-            raise ClientProtocolError(''.join(answer))
-
-        for idx in range(1, len(answer) - 2):
-            tmp = answer[idx].split()
+        for item in answer.split('\n'):
+            tmp = item.split()
 
             if tmp[0] not in result:
-                #   {metric: [(timestamp, value), ...]}
-                result[tmp[0]] = [(int(tmp[2]), float(tmp[1]))]
-                continue
-
+                result[tmp[0]] = []
+            #   {metric: [(timestamp, value), ...], ...}
             result[tmp[0]].append((int(tmp[2]), float(tmp[1])))
 
         # сортировка значений метрик по timestamp
@@ -62,21 +57,25 @@ class Client:
         return result
 
     def _messenger(self, msg):
-        answer = None
-
-        with socket.create_connection(
-            (self._srv_ip, self._srv_port), timeout=self._timeout
-        ) as sock:
-
-            sock.settimeout(self._timeout)
+        answer = ''
+    
+        try:
+            self._conn.sendall(msg.encode('utf8'))
+        except socket.error as err:
+            raise ClientSocketError(f'Ошибка отправки:\n{msg}\n', err)
         
+        while not answer.endswith('\n\n'):
             try:
-                sock.sendall(msg.encode('utf8'))
-                answer = sock.recv(1024)
-
-            except socket.timeout as err:
-                raise ClientSocketError(err)
+                answer += self._conn.recv(1024).decode('utf8')
             except socket.error as err:
-                raise ClientSocketError(err)
-        
-        return answer.decode('utf8')
+                raise ClientSocketError('Ошибка полчения данных:\n', err)
+
+        status, data = answer.split('\n', 1)
+
+        if status == 'error' or status != 'ok':
+            raise ClientProtocolError(f'Ошибка протокола:\n {answer}')
+
+        return data.strip()
+
+    def close(self):
+        self._conn.close()
