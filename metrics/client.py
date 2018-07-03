@@ -2,7 +2,11 @@ import time
 import socket
 
 
-class ClientError(Exception):
+class ClientSocketError(Exception):
+    pass
+
+
+class ClientProtocolError(Exception):
     pass
 
 
@@ -20,7 +24,7 @@ class Client:
         answer = self._messenger(msg)
 
         if answer != 'ok\n\n':
-            raise ClientError(answer)
+            raise ClientProtocolError(answer)
 
     def get(self, metric):
         result = {}
@@ -29,7 +33,10 @@ class Client:
         answer = self._messenger(msg).split('\n')
 
         if answer[0] == 'error':
-            raise ClientError(''.join(answer))
+            raise ClientProtocolError(''.join(answer))
+
+        if answer[0] != 'ok':
+            raise ClientProtocolError(''.join(answer))
 
         for idx in range(1, len(answer) - 2):
             tmp = answer[idx].split()
@@ -61,8 +68,8 @@ class Client:
                 answer = sock.recv(1024)
 
             except socket.timeout as err:
-                raise ClientError(err)
+                raise ClientSocketError(err)
             except socket.error as err:
-                raise ClientError(err)
+                raise ClientSocketError(err)
         
         return answer.decode('utf8')

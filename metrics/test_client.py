@@ -22,7 +22,7 @@ from unittest.mock import patch
 from collections import deque
 
 # импорт модуля с решением
-from client import Client, ClientError
+from client import Client, ClientProtocolError
 
 
 class ServerSocketException(Exception):
@@ -153,7 +153,7 @@ class TestClient(unittest.TestCase):
     @patch("socket.socket", ServerSocket.create_connection)
     def test_client_get_client_error(self):
         try:
-            self.assertRaises(ClientError,
+            self.assertRaises(ClientProtocolError,
                               self.client.get, "get_client_error")
         except ServerSocketException as exp:
             message = exp.args[0]
