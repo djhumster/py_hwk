@@ -2,11 +2,18 @@ import time
 import socket
 
 
-class ClientSocketError(Exception):
+class ClientError(Exception):
+    """Общий класс исключений клиента"""
     pass
 
 
-class ClientProtocolError(Exception):
+class ClientSocketError(ClientError):
+    """Исключение, выбрасываемое клиентом при сетевой ошибке"""
+    pass
+
+
+class ClientProtocolError(ClientError):
+    """Исключение, выбрасываемое клиентом при ошибке протокола"""
     pass
 
 
