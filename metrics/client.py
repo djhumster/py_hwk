@@ -25,6 +25,12 @@ class Client:
             self._conn = socket.create_connection((srv_ip, srv_port), timeout)
         except socket.error as err:
             raise ClientSocketError('Ошибка подключения:\n', err)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_trbk):
+        self.close()
         
     def put(self, metric, value, timestamp=None):
         if timestamp is None:
