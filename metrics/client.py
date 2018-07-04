@@ -33,6 +33,7 @@ class Client:
         self.close()
         
     def put(self, metric, value, timestamp=None):
+        '''Подготовка и отправка метрики на сервер'''
         if timestamp is None:
             timestamp = str(int(time.time()))
 
@@ -40,6 +41,12 @@ class Client:
         self._messenger(msg)
 
     def get(self, metric):
+        '''Запрос метрик с сервера.
+
+        :metric: имя метрики
+                 * - все метрики
+        :return: {metric: [(timestamp, value), ...], ...}
+        '''
         result = {}
         msg = f'get {metric}\n'
 
@@ -63,6 +70,7 @@ class Client:
         return result
 
     def _messenger(self, msg):
+        '''Отправка запроса на сервер и получение ответа'''
         answer = ''
     
         try:
@@ -84,4 +92,5 @@ class Client:
         return data.strip()
 
     def close(self):
+        '''Закрытие сокета'''
         self._conn.close()
