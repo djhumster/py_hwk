@@ -63,10 +63,6 @@ class Client:
             #   {metric: [(timestamp, value), ...], ...}
             result[tmp[0]].append((int(tmp[2]), float(tmp[1])))
 
-        # сортировка значений метрик по timestamp
-        for k in result:
-            result[k].sort(key=lambda tpl: tpl[0])
-
         return result
 
     def _messenger(self, msg):
