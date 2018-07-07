@@ -45,8 +45,8 @@ class ServerSocket:
                            b'test 0.4 2\n\n',
             b'get get_client_error\n': b'error\nwrong command\n\n',
             b'get *\n': b'ok\n'
-                        b'test 0.4 2\n'
                         b'test 0.5 1\n'
+                        b'test 0.4 2\n'
                         b'load 301 3\n\n',
         }
 
