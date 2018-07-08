@@ -22,7 +22,7 @@ from unittest.mock import patch
 from collections import deque
 
 # импорт модуля с решением
-from client import Client, ClientProtocolError
+from metrics.client import Client, ClientProtocolError
 
 
 class ServerSocketException(Exception):
