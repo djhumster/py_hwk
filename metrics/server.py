@@ -4,7 +4,7 @@ import asyncio
 class Storage:
     '''Хранилище {metric: {timestamp: value}, ...}. 
     Возвращает словарь метрик с отсортированными данными по timestamp.
-    {metric: [(timestamp: value), ...]'''
+    {metric: [(timestamp: value), ...], ...}'''
     def __init__(self):
         self._data = {}
 
