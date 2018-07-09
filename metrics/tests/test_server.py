@@ -8,7 +8,7 @@ IN_STORAGE = {
         11: 0.5,
     },
     'test2': {
-        21: 301,
+        21: 301.0,
     }
 }
 METRICS_ALL = {
@@ -17,10 +17,12 @@ METRICS_ALL = {
         (12, 2.0),
     ],
     'test2': [
-        (21, 301),
+        (21, 301.0),
     ]
 }
-METRICS_TEST2 = {'test2': [(21, 301)]}
+S_METRICS_ALL = 'ok\ntest1 0.5 11\ntest1 2.0 12\n' \
+                'test2 301.0 21\n\n'
+METRICS_TEST2 = {'test2': [(21, 301.0)]}
 
 class TestStorage(unittest.TestCase):
     @classmethod
@@ -45,7 +47,11 @@ class TestParser(unittest.TestCase):
         self.parser = Parser()
 
     def test_parser_encode(self):
-        pass
+        compare_empty = [{}]
+        s_compare_empty = 'ok\n\n'
+
+        self.assertEqual(self.parser.encode([METRICS_ALL]), S_METRICS_ALL)
+        self.assertEqual(self.parser.encode(compare_empty), s_compare_empty)
 
     def test_parser_decode(self):
         commands = {
@@ -61,6 +67,7 @@ class TestParser(unittest.TestCase):
             with self.subTest(command=cmd, compare_with=compare_with):
                 self.assertEqual(self.parser.decode(cmd), compare_with)
 
+    def test_parser_decode_err(self):
         get_error = ('get_parser_error', 'put test5 bla bla\n')
 
         for get_err in get_error:
